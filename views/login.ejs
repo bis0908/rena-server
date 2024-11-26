@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%- include('./vendors.ejs') %>
+    <link rel="stylesheet" href="/css/style.css">
+    <title>renaSender::Login</title>
+
+</head>
+
+<body>
+  <div class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+      <strong class="me-auto">Password Change</strong>
+      <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+    <div class="toast-body">
+      Your password has been changed successfully.
+    </div>
+  </div>
+
+  <div class="login-container">
+    <div class="container-sm">
+      <div class="d-flex flex-column justify-content-center">
+        <h1 style="text-align: center;">renaSender
+          <i class="bi bi-envelope-at"></i>
+        </h1>
+        <div class="input-group ">
+          <span class="input-group-text">Password</span>
+          <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <div id="currentPasswordLogin" class="form-text text-danger" style="display:none;">Incorrect password.
+        </div>
+        <div class="d-flex justify-content-between mt-3">
+          <button type="button" class="btn btn-warning change-password" data-bs-toggle="modal"
+            data-bs-target="#passwordChangeModal">
+            <i class="bi bi-file-lock"></i> Change pw
+          </button>
+          <button type="button" class="btn btn-primary" id="login">
+            <i class="bi bi-unlock"></i> Login
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="passwordChangeModal" tabindex="-1" aria-labelledby="passwordChangeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="passwordChangeModalLabel">Change Password</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="passwordChangeForm">
+            <div class="mb-3">
+              <label for="currentPassword" class="form-label">Current Password</label>
+              <input type="password" class="form-control" id="currentPassword">
+              <div id="currentPasswordHelp" class="form-text text-danger" style="display:none;">
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="newPassword" class="form-label">New Password</label>
+              <input type="password" class="form-control" id="newPassword">
+            </div>
+            <div class="mb-3">
+              <label for="confirmNewPassword" class="form-label">Confirm New Password</label>
+              <input type="password" class="form-control" id="confirmNewPassword">
+              <div id="confirmNewPasswordHelp" class="form-text text-danger" style="display:none;">Passwords do not
+                match.</div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" id="submitPasswordChange">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <script src="/js/login.js" type="text/javascript"></script>
+</body>
+
+</html>

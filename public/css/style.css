@@ -1,0 +1,36 @@
+html,
+body {
+  height: 100%;
+}
+
+span {
+  align-self: center;
+  display: inline-flex;
+}
+
+th {
+  text-align-last: center;
+}
+
+.login-container {
+  height: 100%;
+  margin: 0;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+
+.container-sm {
+  max-width: 300px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #b3efff;
+}
+
+.toast {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 1em;
+}
