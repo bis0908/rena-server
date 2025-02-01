@@ -3,7 +3,7 @@ import logger from "../config/logger.js";
 
 export async function serverLogin(password) {
   try {
-    const query = "SELECT * FROM login_renamailer WHERE `password` = SHA2(?, 256);";
+    const query = "SELECT * FROM l_r WHERE `password` = SHA2(?, 256);";
     const result = await pool.query(query, [password]);
 
     if (result[0].length > 0) {
@@ -19,12 +19,12 @@ export async function serverLogin(password) {
 
 export async function changePassword(currentPw, newPw) {
   try {
-    let query = "SELECT * FROM login_renamailer WHERE `password` = SHA2(?, 256);";
+    let query = "SELECT * FROM l_r WHERE `password` = SHA2(?, 256);";
     let result = await pool.query(query, [currentPw]);
 
     if (result[0].length > 0) {
       query =
-        "UPDATE login_renamailer SET `password` = SHA2(?, 256) WHERE `password` = SHA2(?, 256);";
+        "UPDATE l_r SET `password` = SHA2(?, 256) WHERE `password` = SHA2(?, 256);";
       await pool.query(query, [newPw, currentPw]);
       return true;
     } else {

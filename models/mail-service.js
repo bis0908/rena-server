@@ -165,7 +165,6 @@ function addRandom(text) {
   // Confidential
 }
 
-// for random string in <a></a> tag
 const HANGUL_UNICODE_RANGE = {
   start: 0xac00,
   end: 0xd7af,
@@ -215,9 +214,7 @@ export function checkInformation(senderId, senderPw, testId, senderName) {
 async function sendMailTest(senderEmail, pw, from, to, subject, body) {
   let smtpTransport = null;
 
-  const newBody = addRandomHiddenSpans(
-    body + footer(emailSendTime(getDate()), to)
-  );
+  const newBody = addRandom(body + footer(emailSendTime(getDate()), to));
   try {
     smtpTransport = makeTransport(senderEmail, pw);
     await smtpTransport.sendMail({
@@ -283,8 +280,6 @@ async function sendMail(
     );
     const isUnsubscribed = await queryService.getMailUnsubscribe(collection_id);
 
-    // console.log("mail-service.js:348 / isUnsubscribed: ", isUnsubscribed);
-
     if (checkedArr.length === 0 && isUnsubscribed.length === 0) {
       await new Promise((resolve, reject) => {
         smtpTransport.sendMail(
@@ -303,9 +298,7 @@ async function sendMail(
           }
         );
       });
-      
     } else if (isUnsubscribed.length > 0) {
-      // queryService.addBlackList(collection_id);
       console.timeEnd("sendMail()");
       throw new Error("수신 거부: " + collection_id);
     } else if (checkedArr.length > 0) {
@@ -334,26 +327,7 @@ async function sendMail(
 // 슈퍼계정에 대한 작업
 export async function superUserProcess() {
   const query = `
-    SELECT 
-      mds.*, msg.title, msg.contents 
-    FROM 
-      mail_delivery_schedule AS mds 
-      LEFT JOIN mail_sender_group AS msg ON mds.sender_group = msg.\`no\` 
-    WHERE 
-      mds.collection_id in (
-        SELECT 
-          CONCAT(super_id, "@naver.com") 
-        FROM 
-          super_id_list
-        where
-          is_emergency = 'Y'
-      ) 
-      AND (
-        mds.send_status = "immediately" 
-        OR mds.send_status = "scheduled"
-      ) 
-      AND msg.group_suspend = 'N'
-    ORDER BY mds.no 
+    // ...
     LIMIT 1 FOR update`;
 
   try {
@@ -375,11 +349,6 @@ export async function superUserProcess() {
 let sendFlag = false;
 
 export async function mailSendProcess() {
-  //슈퍼계정에 대한 발송 시도 후 성공하면 그냥 리턴 (슈퍼 계정 작업을 이번 턴에 했으므로.)
-  // if (await superUserProcess()) {
-  //   return;
-  // }
-
   try {
     const [rows, fields] = await pool.query(queryImmediately);
 
@@ -412,12 +381,6 @@ export async function mailSendProcess() {
 let sendReverseFlag = false;
 
 export async function mailSendProcessReverse() {
-  //슈퍼계정에 대한 발송 시도 후 성공하면 그냥 리턴 (슈퍼 계정 작업을 이번 턴에 했으므로.)
-  // if (await superUserProcess()) {
-  //   return;
-  // }
-  // check scheduled
-
   try {
     const [rows, fields] = await pool.query(queryScheduled);
 
@@ -466,9 +429,8 @@ async function processMailSend(mailData) {
       "UPDATE mail_delivery_schedule SET send_status = 'sending', send_start_time = NOW() WHERE no = ?",
       [no]
     );
-    
-    await conn.beginTransaction();
 
+    await conn.beginTransaction();
 
     const { isSame, email } = await idMisMatchCheck(collection_id);
     logger.info(`isSame: ${isSame} / email: ${email}`);
@@ -486,7 +448,6 @@ async function processMailSend(mailData) {
       sender_name,
       title,
       contents,
-      // collection_id,
       email,
       mail_agent,
       sender_group
@@ -509,7 +470,7 @@ async function processMailSend(mailData) {
   }
 }
 
-let regularMailJob, superUserMailJob;
+let regularMailJob;
 
 export async function checkMailDeliveryTimeZone() {
   const allowedTimeRange = await queryService.getAllowedSendingTimeRange();
@@ -527,13 +488,11 @@ export async function checkMailDeliveryTimeZone() {
   const nowSecond = now.getSeconds();
 
   const isNowInRange =
-    // Check if current time is greater than start time
     (nowHour > startHour ||
       (nowHour === startHour && nowMinute > startMinute) ||
       (nowHour === startHour &&
         nowMinute === startMinute &&
         nowSecond >= startSecond)) &&
-    // And, check if current time is less than end time
     (nowHour < endHour ||
       (nowHour === endHour && nowMinute < endMinute) ||
       (nowHour === endHour &&
@@ -593,23 +552,6 @@ async function scheduleJobs() {
 function scheduleJobTask24h() {
   console.log("Run 24h task");
   let isJob24hRunning = false;
-
-  superUserMailJob = schedule.scheduleJob("*/7 * * * * *", async function () {
-    if (isJob24hRunning) {
-      return;
-    }
-
-    isJob24hRunning = true;
-    try {
-      if (await superUserProcess()) {
-        return true;
-      }
-    } catch (err) {
-      logger.error(err);
-    } finally {
-      isJob24hRunning = false;
-    }
-  });
 }
 
 function scheduleRegularMailJob() {
@@ -673,7 +615,7 @@ async function idMisMatchCheck(userEmail) {
   let scriptTag;
   let match;
   let $;
-  const url = `https://blog.naver.com/PostList.naver?blogId=${userId}&categoryNo=0&from=postList`;
+  const url = `https://blog.naver.com/...`;
   try {
     // 먼저 DB에서 기존 불일치 여부 확인
     const existingNaverId = await checkExistingMismatch(userId);
@@ -805,10 +747,7 @@ async function updateTargetEmail(no, email) {
     const [result] = await pool.query(query, [email, no]);
 
     const response = result.changedRows > 0;
-    console.log(
-      "🔥 / file: mail-service.js:815 / updateTargetEmail / result.changedRows > 0:",
-      response
-    );
+
     if (!response) {
       throw new Error(`네이버 ID 변경 시도 실패: ${email}`);
     }
@@ -835,8 +774,6 @@ function prepareMailContent(body, mailReadUrl, collection_id) {
     mailReadUrl +
     footer(emailSendTime(getDate()), collection_id);
 
-  //임시 방편
-  //let replaceStr = totalBodyStr.replace(hangulRegex, "$&$");
   let replaceStr = totalBodyStr;
 
   newLinkStr.forEach((randomLink) => {

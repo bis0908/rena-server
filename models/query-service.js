@@ -4,7 +4,7 @@ import { getDate } from "./mail-service.js";
 import logger from "../config/logger.js";
 import pool from "../config/dbConfig.js";
 
-dotenv.config({ path: 'config.env' });
+dotenv.config();
 
 /**
  * Check the DB for sending history.
@@ -57,7 +57,6 @@ export async function getAllowedSendingTimeRange() {
 export async function addSentList(id, senderId, senderEmail) {
   const query = `INSERT IGNORE INTO mail_sendlist (id, regdate, agent_no, sender_id) values (?,?,?,?);`;
   try {
-    // console.log("try addSentList()");
     const result = await pool.query(query, [
       id,
       getDate(),
@@ -141,7 +140,6 @@ export async function getMailUnsubscribe(email) {
 }
 
 export async function addBlackList(id) {
-  // const email = id + "@naver.com";
   const query = `INSERT IGNORE INTO mail_unsubscribe (email, reg_date) values (?, now());`;
   try {
     const result = await pool.query(query, [id]);
