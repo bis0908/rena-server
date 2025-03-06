@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(function () {
   $("#password").on("keydown", function (e) {
     if (e.key === "Enter") {
       tryLogin();
@@ -31,7 +31,10 @@ $("#submitPasswordChange").on("click", function (e) {
     return;
   }
 
-  if (currentPassword === newPassword && currentPassword === confirmNewPassword) {
+  if (
+    currentPassword === newPassword &&
+    currentPassword === confirmNewPassword
+  ) {
     $("#currentPasswordHelp").text("현재 암호와 변경할 암호가 동일합니다");
     $("#currentPasswordHelp").show();
     return;
@@ -63,7 +66,7 @@ function tryLogin() {
 function changePassword(currentPassword, newPassword) {
   $.ajax({
     url: "/auth/changePassword",
-    type: "post",
+    type: "patch",
     async: false,
     data: {
       currentPw: currentPassword,

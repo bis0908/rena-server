@@ -12,7 +12,7 @@ dotenv.config({ path: "config.env" });
 
 let flag = 1;
 
-const queryScheduled = `
+const queryScheduledLock = `
     SELECT mds.*, msg.title, msg.contents
     FROM mail_delivery_schedule AS mds LEFT JOIN mail_sender_group AS msg
     ON mds.sender_group = msg.\`no\`
@@ -23,7 +23,7 @@ const queryScheduled = `
     LIMIT 1
     FOR UPDATE`;
 
-const queryImmediately = `
+const queryImmediatelyLock = `
     SELECT mds.*, msg.title, msg.contents
     FROM mail_delivery_schedule AS mds LEFT JOIN mail_sender_group AS msg
     ON mds.sender_group = msg.\`no\`
@@ -350,7 +350,7 @@ let sendFlag = false;
 
 export async function mailSendProcess() {
   try {
-    const [rows, fields] = await pool.query(queryImmediately);
+    const [rows, fields] = await pool.query(queryImmediatelyLock);
 
     if (rows.length > 0 && !sendFlag) {
       logger.info("running immediate in mailSendProcess()");
@@ -360,7 +360,7 @@ export async function mailSendProcess() {
         return 1;
       }
     } else {
-      const [rows, fields] = await pool.query(queryScheduled);
+      const [rows, fields] = await pool.query(queryScheduledLock);
 
       if (rows.length > 0 && !sendFlag) {
         logger.info("running scheduled in mailSendProcess()");
@@ -382,7 +382,7 @@ let sendReverseFlag = false;
 
 export async function mailSendProcessReverse() {
   try {
-    const [rows, fields] = await pool.query(queryScheduled);
+    const [rows, fields] = await pool.query(queryScheduledLock);
 
     if (rows.length > 0 && !sendReverseFlag) {
       logger.info("running scheduled in mailSendProcessReverse()");
@@ -392,7 +392,7 @@ export async function mailSendProcessReverse() {
         return 1;
       }
     } else {
-      const [rows, fields] = await pool.query(queryImmediately);
+      const [rows, fields] = await pool.query(queryImmediatelyLock);
 
       if (rows.length > 0 && !sendReverseFlag) {
         logger.info("running immediate in mailSendProcessReverse()");

@@ -20,7 +20,7 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
-authRouter.post("/changePassword", async (req, res) => {
+authRouter.patch("/changePassword", async (req, res) => {
   const { currentPw, newPw } = req.body;
 
   try {

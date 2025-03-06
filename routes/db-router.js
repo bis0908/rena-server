@@ -4,7 +4,7 @@ import * as queryService from "../models/query-service.js";
 
 export const queryRouter = express.Router();
 
-queryRouter.post("/mailDeliverySchedule", async (req, res) => {
+queryRouter.get("/mailDeliverySchedule", async (req, res) => {
   try {
     const result = await queryService.getDeliverySchedule();
     res.status(200).send(result);
@@ -14,10 +14,13 @@ queryRouter.post("/mailDeliverySchedule", async (req, res) => {
   }
 });
 
-queryRouter.post("/updateMailDeliverySchedule", async (req, res) => {
+queryRouter.patch("/updateMailDeliverySchedule", async (req, res) => {
   try {
     const { no, newSendStartTime } = req.body;
-    const result = await queryService.updateMailDeliverySchedule(no, newSendStartTime);
+    const result = await queryService.updateMailDeliverySchedule(
+      no,
+      newSendStartTime
+    );
     res.status(200).send(result);
   } catch (error) {
     logger.error(error.stack);
@@ -39,7 +42,11 @@ queryRouter.post("/dbMailingRegistration", async (req, res) => {
 queryRouter.post("/addSentList", async (req, res) => {
   const { idList, senderId, senderEmail } = req.body;
   try {
-    const result = await queryService.addSentList(idList, senderId, senderEmail);
+    const result = await queryService.addSentList(
+      idList,
+      senderId,
+      senderEmail
+    );
     res.status(200).send(result);
   } catch (error) {
     logger.error("queryRouter.post(/addSentList: " + error.stack);
@@ -47,7 +54,7 @@ queryRouter.post("/addSentList", async (req, res) => {
   }
 });
 
-queryRouter.post("/getAllowedTimeZone", async (req, res) => {
+queryRouter.get("/getAllowedTimeZone", async (req, res) => {
   try {
     const result = await queryService.getAllowedSendingTimeRange();
     res.status(200).json(result);
@@ -57,7 +64,7 @@ queryRouter.post("/getAllowedTimeZone", async (req, res) => {
   }
 });
 
-queryRouter.post("/updateServerName", async (req, res) => {
+queryRouter.patch("/updateServerName", async (req, res) => {
   const { newSenderName, rowNo } = req.body;
   try {
     const result = await queryService.updateServerName(newSenderName, rowNo);
@@ -68,7 +75,7 @@ queryRouter.post("/updateServerName", async (req, res) => {
   }
 });
 
-queryRouter.post("/deleteServerName", async (req, res) => {
+queryRouter.delete("/deleteServerName", async (req, res) => {
   const { rowNo } = req.body;
   try {
     const result = await queryService.deleteServerName(rowNo);

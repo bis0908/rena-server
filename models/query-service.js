@@ -7,7 +7,7 @@ import pool from "../config/dbConfig.js";
 dotenv.config();
 
 /**
- * Check the DB for sending history.
+ * @description Check the DB for sending history.
  * @param {Array} idList
  * @param {string} agent_no
  * @returns id from DB
@@ -44,6 +44,10 @@ export async function realTimeIdCheck(idList, agent_no) {
   }
 }
 
+/**
+ * @description Get the allowed sending time range.
+ * @returns {Object} startTime, endTime
+ */
 export async function getAllowedSendingTimeRange() {
   const [rows, fields] = await pool.query(
     "SELECT start_time, end_time FROM mail_delivery_timezone LIMIT 1"
@@ -54,6 +58,13 @@ export async function getAllowedSendingTimeRange() {
   return false;
 }
 
+/**
+ * @description Add a sent list to the database.
+ * @param {string} id
+ * @param {string} senderId
+ * @param {string} senderEmail
+ * @returns {boolean}
+ */
 export async function addSentList(id, senderId, senderEmail) {
   const query = `INSERT IGNORE INTO mail_sendlist (id, regdate, agent_no, sender_id) values (?,?,?,?);`;
   try {
@@ -75,6 +86,12 @@ export async function addSentList(id, senderId, senderEmail) {
   }
 }
 
+/**
+ * @description Update the server name.
+ * @param {string} newServerName
+ * @param {number} rowNo
+ * @returns {boolean}
+ */
 export async function updateServerName(newServerName, rowNo) {
   const query = `UPDATE mail_server_status
                   SET \`server_name\` = ?
@@ -92,6 +109,11 @@ export async function updateServerName(newServerName, rowNo) {
   }
 }
 
+/**
+ * @description Delete the server name.
+ * @param {number} rowNo
+ * @returns {boolean}
+ */
 export async function deleteServerName(rowNo) {
   const query = `DELETE FROM mail_server_status
   WHERE \`no\` = ?`;
@@ -109,6 +131,10 @@ export async function deleteServerName(rowNo) {
   }
 }
 
+/**
+ * @description Get the super IDs.
+ * @returns {Array} superIds
+ */
 export async function getSuperIds() {
   const query = "select super_id from super_id_list";
   try {
@@ -121,6 +147,11 @@ export async function getSuperIds() {
   }
 }
 
+/**
+ * @description Get the mail unsubscribe.
+ * @param {string} email
+ * @returns {Array}
+ */
 export async function getMailUnsubscribe(email) {
   const query = `select email from mail_unsubscribe where email = ? limit 1`;
   try {
@@ -139,6 +170,11 @@ export async function getMailUnsubscribe(email) {
   }
 }
 
+/**
+ * @description Add a black list to the database.
+ * @param {string} id
+ * @returns {boolean}
+ */
 export async function addBlackList(id) {
   const query = `INSERT IGNORE INTO mail_unsubscribe (email, reg_date) values (?, now());`;
   try {
